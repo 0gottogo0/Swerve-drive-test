@@ -180,6 +180,10 @@ public class Drivetrain extends SubsystemBase {
     
   }
 
+  public void stopDrive(){
+        states = Constants.kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
+  }
+
   private void updateOdometry() {
         //states = moduleStates;
         pose = odometry.update(getGyroscopeRotation(), getSwerveModulePositions());

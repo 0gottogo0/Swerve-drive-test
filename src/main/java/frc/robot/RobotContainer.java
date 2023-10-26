@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+
+import com.pathplanner.lib.util.PIDConstants;
+import com.swervedrivespecialties.swervelib.SwerveModuleFactoryBuilder;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,8 +48,44 @@ public class RobotContainer {
       .onTrue( new InstantCommand(() -> drivetrain.zeroGyroscope()));
   }
 
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+
+    // This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
+    
+
+    HashMap<String, Command> eventMap = new HashMap<>();
+    
+    SwerveModuleFactoryBuilder autoBuilder = new SwerveAutoBuilder(
+      drivetrain::getPose, 
+      drivetrain::resetOdometry, 
+      Constants.kinematics, 
+      new PIDConstants(Constants.kPXYController, 0, 0), 
+      new PIDConstants(Constants.kPThetaController, 0, Constants.kDThetaController), 
+      drivetrain::setModuleStates, 
+      eventMap, 
+      true,
+      drivetrain
+      );
+      
+    Command auto;
+    
+    auto = autoBuilder.fullAuto(autoChooser.getSelected());
+    
+      
+      
+
+    // Reset odometry to the starting pose of the trajectory.
+    //drivetrain.resetOdometry(examplePath.getInitialPose());
+
+    // Run path following command, then stop at the end.
+    return auto
+    .andThen(() -> drivetrain.stopDrive());
+
   }
 
   private static double deadband(double value, double deadband) { 
