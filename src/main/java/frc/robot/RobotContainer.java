@@ -6,10 +6,14 @@ package frc.robot;
 
 import java.util.HashMap;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PIDConstants;
 import com.swervedrivespecialties.swervelib.SwerveModuleFactoryBuilder;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +27,8 @@ public class RobotContainer {
   private final DriveCommand driveCommand;
 
   private final XboxController controllerDriver = new XboxController(0);
+
+  private SendableChooser<String> autoChooser = new SendableChooser<String>();
   public RobotContainer() {
     drivetrain = new Drivetrain();
     // Set up the default command for the drivetrain.
@@ -38,6 +44,13 @@ public class RobotContainer {
       );
 
     drivetrain.setDefaultCommand(driveCommand);
+
+    autoChooser.setDefaultOption("idk", "idk");
+    autoChooser.addOption("Spin", "spinspin");
+    autoChooser.addOption("Test", "Test");
+
+    SmartDashboard.putData(autoChooser);
+
     configureBindings();
   }
 
@@ -54,37 +67,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
-    // This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
-    
-
-    HashMap<String, Command> eventMap = new HashMap<>();
-    
-    SwerveModuleFactoryBuilder autoBuilder = new SwerveAutoBuilder(
-      drivetrain::getPose, 
-      drivetrain::resetOdometry, 
-      Constants.kinematics, 
-      new PIDConstants(Constants.kPXYController, 0, 0), 
-      new PIDConstants(Constants.kPThetaController, 0, Constants.kDThetaController), 
-      drivetrain::setModuleStates, 
-      eventMap, 
-      true,
-      drivetrain
-      );
-      
-    Command auto;
-    
-    auto = autoBuilder.fullAuto(autoChooser.getSelected());
-    
-      
       
 
     // Reset odometry to the starting pose of the trajectory.
     //drivetrain.resetOdometry(examplePath.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return auto
-    .andThen(() -> drivetrain.stopDrive());
+
+     PathPlannerAuto auto = new PathPlannerAuto("Test");
+
+    
+
+    return auto;
 
   }
 

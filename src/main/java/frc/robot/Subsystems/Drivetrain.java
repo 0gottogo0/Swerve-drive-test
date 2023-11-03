@@ -22,6 +22,10 @@ import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
 import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_OFFSET;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
@@ -33,7 +37,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -132,6 +136,33 @@ public class Drivetrain extends SubsystemBase {
      
     odometry =  
         new SwerveDriveOdometry(Constants.kinematics, getGyroscopeRotation(), getSwerveModulePositions());
+
+
+        AutoBuilder.configureHolonomic(
+                this::getPose, 
+                this::resetOdometry, 
+                this::getRobotRelativeSpeeds, 
+                this::setRobotRelitiveSpeeds, 
+                new HolonomicPathFollowerConfig(
+                        new PIDConstants(Constants.kPXYController, 0, 0), 
+                        new PIDConstants(Constants.kPThetaController, 0, 0), 
+                        Constants.MAX_VELOCITY_METERS_PER_SECOND, 
+                        Units.inchesToMeters(32), 
+                        new ReplanningConfig()
+                ), 
+                this
+        );
+    /*AutoBuilder.configureHolonomic(
+        this::getPose, 
+        this::resetOdometry, 
+        Constants.kinematics, 
+        new PIDConstants(Constants.kPXYController, 0, 0), 
+        new PIDConstants(Constants.kPThetaController, 0, Constants.kDThetaController), 
+        this::setModuleStates, 
+        null, 
+        true,
+        this
+      );*/
   }
 
   public Rotation2d getGyroscopeRotation() {
@@ -189,6 +220,9 @@ public class Drivetrain extends SubsystemBase {
         pose = odometry.update(getGyroscopeRotation(), getSwerveModulePositions());
         
     }
+  private void resetOdometry(Pose2d pose){
+        odometry.resetPosition(getGyroscopeRotation(), getSwerveModulePositions(), pose);
+  }
 
   /**
    * Sets the swerve ModuleStates.
@@ -200,6 +234,15 @@ public class Drivetrain extends SubsystemBase {
         
         
   }
+
+  public ChassisSpeeds getRobotRelativeSpeeds(){
+        return Constants.kinematics.toChassisSpeeds(states);
+  }
+
+  public void setRobotRelitiveSpeeds(ChassisSpeeds speeds){
+        setModuleStates(Constants.kinematics.toSwerveModuleStates(speeds));
+  }
+
 
   @Override
   public void periodic() {
