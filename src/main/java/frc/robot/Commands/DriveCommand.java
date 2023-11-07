@@ -8,11 +8,11 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Drivetrain;
 
-public class DriveCommand extends CommandBase {
+public class DriveCommand extends Command {
   private Drivetrain drivetrain;
 
   private DoubleSupplier translationXSupplier;

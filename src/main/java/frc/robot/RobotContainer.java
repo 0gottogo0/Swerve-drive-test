@@ -28,7 +28,7 @@ public class RobotContainer {
 
   private final XboxController controllerDriver = new XboxController(0);
 
-  private SendableChooser<String> autoChooser = new SendableChooser<String>();
+  private SendableChooser<Command> autoChooser;
   public RobotContainer() {
     drivetrain = new Drivetrain();
     // Set up the default command for the drivetrain.
@@ -45,9 +45,7 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(driveCommand);
 
-    autoChooser.setDefaultOption("idk", "idk");
-    autoChooser.addOption("Spin", "spinspin");
-    autoChooser.addOption("Test", "Test");
+    autoChooser = AutoBuilder.buildAutoChooser("Test");
 
     SmartDashboard.putData(autoChooser);
 
@@ -74,11 +72,7 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
 
-     PathPlannerAuto auto = new PathPlannerAuto("Test");
-
-    
-
-    return auto;
+    return autoChooser.getSelected();
 
   }
 
