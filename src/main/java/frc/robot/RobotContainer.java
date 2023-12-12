@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.HashMap;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PIDConstants;
 import com.swervedrivespecialties.swervelib.SwerveModuleFactoryBuilder;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.DriveCommand;
+import frc.robot.Commands.Test;
 import frc.robot.Subsystems.Drivetrain;
 
 public class RobotContainer {
@@ -45,9 +47,11 @@ public class RobotContainer {
 
     drivetrain.setDefaultCommand(driveCommand);
 
-    autoChooser = AutoBuilder.buildAutoChooser("Test");
+    autoChooser = AutoBuilder.buildAutoChooser();
 
-    SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    NamedCommands.registerCommand("Test", new Test());
 
     configureBindings();
   }
@@ -72,7 +76,7 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
 
-    return autoChooser.getSelected();
+    return AutoBuilder.buildAuto("Test1");
 
   }
 

@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -195,6 +196,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+        SmartDashboard.putString("test", "Test");
     return odometry.getPoseMeters();
   }
 
@@ -247,11 +249,12 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("heading", getGyroscopeRotation().getDegrees());
 
     updateOdometry();
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
-                states, Constants.MAX_VELOCITY_METERS_PER_SECOND);
+                states, Constants.MAX_VELOCITY_METERS_PER_SECOND/4);
 
     frontLeftModule.set(feedforwardLeft.calculate(states[0].speedMetersPerSecond), states[0].angle.getRadians());
         frontRightModule.set(feedforwardRight.calculate(states[1].speedMetersPerSecond), states[1].angle.getRadians());
